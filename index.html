@@ -269,7 +269,7 @@ function goScreen(id){
   if(id==='s4'){ startVideos(); }
 }
 
-/* ── MAYBE BUTTON EVASION (Super 3D Pop + Popping Smoke) ── */
+/* ── MAYBE BUTTON EVASION (Isolated ONLY to Maybe button itself) ── */
 var mb=document.getElementById('btn-maybe');
 var DUST=['💨','🙈','🏃💨','💨','✨','😜'];
 
@@ -290,7 +290,7 @@ function runAwayMaybe(e){
   var r=mb.getBoundingClientRect();
   spawnDust(r.left + r.width/2, r.top + r.height/2);
 
-  // Calculate dramatic offsets with tilt & scale
+  // Dynamic 3D tilt & spring offset
   var offsetX = (Math.random() > 0.5 ? 1 : -1) * (120 + Math.random() * 120);
   var offsetY = (Math.random() > 0.5 ? 1 : -1) * (90 + Math.random() * 110);
   var rotate = (Math.random() - 0.5) * 24;
@@ -298,32 +298,17 @@ function runAwayMaybe(e){
   mb.style.transform = 'translate3d(' + offsetX + 'px, ' + offsetY + 'px, 0) scale(1.08) rotate(' + rotate + 'deg)';
 }
 
-/* Desktop proximity check */
-document.addEventListener('mousemove', function(e){
-  if(curScr!=='s1' || !mb) return;
-  var r=mb.getBoundingClientRect();
-  var mx=r.left+r.width/2;
-  var my=r.top+r.height/2;
-  var d=Math.sqrt(Math.pow(e.clientX-mx, 2) + Math.pow(e.clientY-my, 2));
-  if(d < 130) {
-    runAwayMaybe();
-  }
-});
-
-/* Mobile touch handling */
+// Bind evasion EXCLUSIVELY to Maybe button element (NEVER on global document)
 if(mb){
+  mb.addEventListener('mouseenter', runAwayMaybe);
+  mb.addEventListener('mousemove', runAwayMaybe);
   mb.addEventListener('touchstart', function(e){
     runAwayMaybe(e);
   }, {passive: false});
-  mb.addEventListener('mouseover', function(e){
-    runAwayMaybe(e);
-  });
-  mb.addEventListener('click', function(e){
-    runAwayMaybe(e);
-  });
+  mb.addEventListener('click', runAwayMaybe);
 }
 
-/* ── YES BUTTON CLICK (Bulletproof Try-Catch Architecture) ── */
+/* ── YES BUTTON CLICK (Isolated, Un-cancelable, Guaranteed) ── */
 function spawnHeart(x,y){
   var h=document.createElement('div');h.className='fh';
   h.textContent=PE[Math.floor(Math.random()*PE.length)];
@@ -336,12 +321,14 @@ function spawnHeart(x,y){
 }
 
 function onYesClick(e){
+  if(e && e.stopPropagation) e.stopPropagation();
+
   // 1. Immediately switch screen guaranteed!
   try {
     goScreen('s2');
   } catch(err){ console.log(err); }
   
-  // 2. Un-lock & play background song
+  // 2. Play song
   try {
     var bgm=document.getElementById('bgm');
     if(bgm){
@@ -359,7 +346,7 @@ function onYesClick(e){
     }
   } catch(err){}
 
-  // 4. Heart explosion async
+  // 4. Heart explosion
   try {
     var btn=document.getElementById('btn-yes');
     if(btn){
@@ -380,9 +367,6 @@ if(yesBtn){
   yesBtn.onclick = onYesClick;
   yesBtn.addEventListener('click', onYesClick);
   yesBtn.addEventListener('pointerdown', onYesClick);
-  yesBtn.addEventListener('touchend', function(e){
-    onYesClick(e);
-  });
 }
 
 /* ── SLIDER ── */
