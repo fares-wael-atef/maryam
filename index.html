@@ -352,6 +352,7 @@ function handleYes(){
   for(var i=0;i<12;i++) spawnHeart(r.left+r.width/2, r.top+r.height/2);
   setTimeout(function(){ document.getElementById('ov').classList.add('on'); },160);
 }
+document.getElementById('btn-yes').addEventListener('click', handleYes);
 
 function goPhotos(){
   document.getElementById('ov').classList.remove('on');
