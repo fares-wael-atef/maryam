@@ -152,7 +152,7 @@ video{width:100%;max-width:480px;max-height:68dvh;border-radius:20px;object-fit:
     <h1 class="q-title">Do you love me?</h1>
     <p class="q-sub">Think carefully before you answer 😏</p>
     <div class="btn-row">
-      <button id="btn-yes" type="button">Yes 💕</button>
+      <button id="btn-yes" type="button" onclick="onYesClick(event)">Yes 💕</button>
       <button id="btn-maybe" type="button">Maybe 🤔</button>
     </div>
   </div>
@@ -293,7 +293,7 @@ function runAwayMaybe(e){
   // Calculate dramatic offsets with tilt & scale
   var offsetX = (Math.random() > 0.5 ? 1 : -1) * (120 + Math.random() * 120);
   var offsetY = (Math.random() > 0.5 ? 1 : -1) * (90 + Math.random() * 110);
-  var rotate = (Math.random() - 0.5) * 24; // playful rotation
+  var rotate = (Math.random() - 0.5) * 24;
 
   mb.style.transform = 'translate3d(' + offsetX + 'px, ' + offsetY + 'px, 0) scale(1.08) rotate(' + rotate + 'deg)';
 }
@@ -323,7 +323,7 @@ if(mb){
   });
 }
 
-/* ── YES BUTTON CLICK (Ultra Fail-Proof) ── */
+/* ── YES BUTTON CLICK (Bulletproof Try-Catch Architecture) ── */
 function spawnHeart(x,y){
   var h=document.createElement('div');h.className='fh';
   h.textContent=PE[Math.floor(Math.random()*PE.length)];
@@ -336,37 +336,43 @@ function spawnHeart(x,y){
 }
 
 function onYesClick(e){
-  if(e && e.stopPropagation) e.stopPropagation();
+  // 1. Immediately switch screen guaranteed!
+  try {
+    goScreen('s2');
+  } catch(err){ console.log(err); }
   
-  // 1. Un-lock & play background song
-  var bgm=document.getElementById('bgm');
-  if(bgm){
-    bgm.volume=0.75;
-    bgm.play().catch(function(){});
-    var mbar=document.getElementById('mbar');
-    if(mbar) mbar.classList.add('show');
-  }
-
-  // 2. Hide maybe button
-  if(mb){
-    mb.style.opacity='0';
-    mb.style.pointerEvents='none';
-  }
-
-  // 3. Spurt 25 floating hearts
-  var btn=document.getElementById('btn-yes');
-  if(btn){
-    var r=btn.getBoundingClientRect();
-    for(var i=0;i<25;i++){
-      spawnHeart(r.left+r.width/2, r.top+r.height/2);
+  // 2. Un-lock & play background song
+  try {
+    var bgm=document.getElementById('bgm');
+    if(bgm){
+      bgm.volume=0.75;
+      bgm.play().catch(function(){});
+      var mbar=document.getElementById('mbar');
+      if(mbar) mbar.classList.add('show');
     }
-  }
+  } catch(err){}
 
-  // 4. Instant transition to Screen 2
-  goScreen('s2');
+  // 3. Hide maybe button
+  try {
+    if(mb){
+      mb.style.display='none';
+    }
+  } catch(err){}
+
+  // 4. Heart explosion async
+  try {
+    var btn=document.getElementById('btn-yes');
+    if(btn){
+      var r=btn.getBoundingClientRect();
+      var cx=r.left+r.width/2;
+      var cy=r.top+r.height/2;
+      setTimeout(function(){
+        for(var i=0;i<18;i++){ spawnHeart(cx, cy); }
+      }, 10);
+    }
+  } catch(err){}
 }
 
-// Bind to window & element with click, pointerdown, and touchend
 window.onYesClick = onYesClick;
 
 var yesBtn=document.getElementById('btn-yes');
@@ -375,7 +381,6 @@ if(yesBtn){
   yesBtn.addEventListener('click', onYesClick);
   yesBtn.addEventListener('pointerdown', onYesClick);
   yesBtn.addEventListener('touchend', function(e){
-    e.preventDefault();
     onYesClick(e);
   });
 }
